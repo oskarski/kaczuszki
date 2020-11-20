@@ -7,6 +7,7 @@ export const getDuck = /* GraphQL */ `
       id
       name
       description
+      image
       createdAt
       updatedAt
     }
@@ -23,6 +24,7 @@ export const listDucks = /* GraphQL */ `
         id
         name
         description
+        image
         createdAt
         updatedAt
       }

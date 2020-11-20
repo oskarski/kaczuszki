@@ -1,31 +1,48 @@
 import React, {useEffect, useState} from 'react';
 import {withAuthenticator} from "@aws-amplify/ui-react";
-import { API } from 'aws-amplify';
+import { API, Storage } from 'aws-amplify';
 import {listDucks} from "./graphql/queries";
 import {createDuck} from "./graphql/mutations";
 
 const App = () => {
     const [ducks, setDucks] = useState<any[]>([]);
-    const [refresh, setRefresh] = useState(0);
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [image, setImage] = useState<any>(null);
+
+    const fetchDucks = async () => {
+        const apiData = await API.graphql({query: listDucks});
+        // @ts-ignore
+        const newDucks = await Promise.all(apiData.data.listDucks.items.map(async duck => {
+            if (duck.image) {
+                const img = await Storage.get(duck.image);
+                duck.image = img;
+            }
+
+            return duck
+        }))
+
+        setDucks(newDucks);
+    };
 
     useEffect(() => {
-        (async () => {
-            const apiData = await API.graphql({query: listDucks});
-
-            // @ts-ignore
-            setDucks(apiData.data.listDucks.items);
-        })()
-    }, [refresh]);
+        fetchDucks();
+    }, []);
 
     const onSubmit = async (e: any) => {
         e.preventDefault();
-        if (!name || !description) return;
+        if (!name || !description || !image) return;
 
-        await API.graphql({query: createDuck, variables: {input: {name, description}}})
-        setRefresh(refresh  +1);
+        const res: any = await Storage.put(image.name, image)
+
+        await API.graphql({query: createDuck, variables: {input: {name, description, image: res.key}}})
+
+        fetchDucks();
+
+        setName('');
+        setImage(null);
+        setDescription('');
     }
 
     return (
@@ -36,6 +53,7 @@ const App = () => {
                 {ducks.map(duck => (
                     <li key={duck.id}>
                         <h4>{duck.name}</h4>
+                        <img src={duck.image} alt={duck.name} />
                         <p>{duck.description}</p>
                     </li>
                 ))}
@@ -44,6 +62,10 @@ const App = () => {
             <form action="" onSubmit={onSubmit}>
                 <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Duck name"/>
                 <textarea placeholder="Duck description" onChange={e => setDescription(e.target.value)}>{description}</textarea>
+                <input type="file" placeholder="Image" onChange={e => {
+                    // @ts-ignore
+                    setImage(e.target.files[0]);
+                }} />
 
                 <button>Add your duck</button>
             </form>

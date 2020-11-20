@@ -10,6 +10,7 @@ export const createDuck = /* GraphQL */ `
       id
       name
       description
+      image
       createdAt
       updatedAt
     }
@@ -24,6 +25,7 @@ export const updateDuck = /* GraphQL */ `
       id
       name
       description
+      image
       createdAt
       updatedAt
     }
@@ -38,6 +40,7 @@ export const deleteDuck = /* GraphQL */ `
       id
       name
       description
+      image
       createdAt
       updatedAt
     }
