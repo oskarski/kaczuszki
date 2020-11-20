@@ -1,0 +1,17 @@
+.duck-image-wrapper {
+    padding-bottom: 70%;
+}
+
+.duck-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: 70%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.duck-image img {
+    display: none;
+}
