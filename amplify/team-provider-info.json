@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-kaczuszki-dev-120330-authRole",
+      "UnauthRoleArn": "arn:aws:iam::117706803388:role/amplify-kaczuszki-dev-120330-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::117706803388:role/amplify-kaczuszki-dev-120330-authRole",
+      "Region": "eu-central-1",
+      "DeploymentBucketName": "amplify-kaczuszki-dev-120330-deployment",
+      "UnauthRoleName": "amplify-kaczuszki-dev-120330-unauthRole",
+      "StackName": "amplify-kaczuszki-dev-120330",
+      "StackId": "arn:aws:cloudformation:eu-central-1:117706803388:stack/amplify-kaczuszki-dev-120330/07688410-2b20-11eb-a432-0640a0772cc2",
+      "AmplifyAppId": "d229bkn5oeyfog"
+    },
+    "categories": {
+      "auth": {
+        "kaczuszkif44c3a4a": {}
+      }
+    }
+  }
+}
