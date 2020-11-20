@@ -8,6 +8,8 @@ export const getDuck = /* GraphQL */ `
       name
       description
       image
+      speed
+      pitch
       createdAt
       updatedAt
     }
@@ -25,6 +27,8 @@ export const listDucks = /* GraphQL */ `
         name
         description
         image
+        speed
+        pitch
         createdAt
         updatedAt
       }

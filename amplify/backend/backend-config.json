@@ -1,6 +1,6 @@
 {
   "auth": {
-    "kaczuszkif44c3a4a": {
+    "kaczuszkia73f7bb6": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],

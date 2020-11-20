@@ -3,18 +3,18 @@ import {withAuthenticator} from "@aws-amplify/ui-react";
 import {API, Storage} from 'aws-amplify';
 import {listDucks} from "./graphql/queries";
 import {createDuck} from "./graphql/mutations";
-import {Button, Card, Col, Form, Input, Layout, Modal, Row, Upload} from 'antd';
+import {Button, Card, Col, Form, Input, InputNumber, Layout, Modal, Row, Upload} from 'antd';
 import './App.css'
 
 const {Content, Footer} = Layout;
 
 window.speechSynthesis.getVoices()
 
-const say = (text: string) => {
+const say = (text: string, rate = 1.4, pitch = 0.7) => {
     let speechSynthesisUtterance = new SpeechSynthesisUtterance(text)
     speechSynthesisUtterance.lang = "en";
-    speechSynthesisUtterance.pitch = 0.7;
-    speechSynthesisUtterance.rate = 1.4;
+    speechSynthesisUtterance.pitch = pitch;
+    speechSynthesisUtterance.rate = rate;
     const voices = window.speechSynthesis.getVoices();
 
     speechSynthesisUtterance.voice = voices.length > 12 ? voices[12] : voices[0];
@@ -28,6 +28,8 @@ const App = () => {
     const [description, setDescription] = useState('');
     const [image, setImage] = useState<any>(null);
     const [modalVisible, toggleModalVisible] = useState(false);
+    const [speed, setSpeed] = useState(1.4);
+    const [pitch, setPitch] = useState(0.7);
 
     const fetchDucks = async () => {
         const apiData = await API.graphql({query: listDucks});
@@ -51,16 +53,18 @@ const App = () => {
     const resetForm = () => {
         setName('');
         setImage(null);
+        setPitch(0.7);
+        setSpeed(1.4);
         setDescription('');
     };
 
     const onSubmit = async (e: any) => {
         e.preventDefault();
-        if (!name || !description || !image) return;
+        if (!name || !description || !image || !pitch || !speed) return;
 
         const res: any = await Storage.put(image.name, image)
 
-        await API.graphql({query: createDuck, variables: {input: {name, description, image: res.key}}})
+        await API.graphql({query: createDuck, variables: {input: {name, description, image: res.key, pitch, speed}}})
 
         fetchDucks();
 
@@ -71,8 +75,15 @@ const App = () => {
     const onDuckClick = (duck: any) => () => {
         if (window.speechSynthesis.speaking) return;
 
-        say(duck.description);
+        say(duck.description, duck.speed, duck.pitch);
     };
+
+    const onPlayButtonClick = () => {
+        if (!description || !pitch || !speed) return;
+        if (window.speechSynthesis.speaking) return;
+
+        say(description, speed, pitch);
+    }
 
 
     const onCancel = () => {
@@ -140,6 +151,24 @@ const App = () => {
                                 <Form.Item label="Quote">
                                     <Input.TextArea value={description} onChange={e => setDescription(e.target.value)}/>
                                 </Form.Item>
+
+                                <Row gutter={16}>
+                                    <Col>
+                                        <Form.Item label="Speech speed">
+                                            <InputNumber min={0.1} max={10} value={speed} onChange={val => setSpeed(val as number)} step={0.1} />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col>
+                                        <Form.Item label="Speech pitch">
+                                            <InputNumber min={0} max={2} value={pitch} onChange={val => setPitch(val as number)} step={0.1} />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col>
+                                        <Form.Item label=" "><Button onClick={onPlayButtonClick}>Play</Button></Form.Item>
+                                    </Col>
+                                </Row>
 
                                 <Form.Item label="Image">
                                     <Upload

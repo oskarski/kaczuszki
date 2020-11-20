@@ -8,6 +8,8 @@ export const onCreateDuck = /* GraphQL */ `
       name
       description
       image
+      speed
+      pitch
       createdAt
       updatedAt
     }
@@ -20,6 +22,8 @@ export const onUpdateDuck = /* GraphQL */ `
       name
       description
       image
+      speed
+      pitch
       createdAt
       updatedAt
     }
@@ -32,6 +36,8 @@ export const onDeleteDuck = /* GraphQL */ `
       name
       description
       image
+      speed
+      pitch
       createdAt
       updatedAt
     }

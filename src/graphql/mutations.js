@@ -11,6 +11,8 @@ export const createDuck = /* GraphQL */ `
       name
       description
       image
+      speed
+      pitch
       createdAt
       updatedAt
     }
@@ -26,6 +28,8 @@ export const updateDuck = /* GraphQL */ `
       name
       description
       image
+      speed
+      pitch
       createdAt
       updatedAt
     }
@@ -41,6 +45,8 @@ export const deleteDuck = /* GraphQL */ `
       name
       description
       image
+      speed
+      pitch
       createdAt
       updatedAt
     }
