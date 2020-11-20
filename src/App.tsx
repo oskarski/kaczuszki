@@ -3,11 +3,23 @@ import {withAuthenticator} from "@aws-amplify/ui-react";
 import {API, Storage} from 'aws-amplify';
 import {listDucks} from "./graphql/queries";
 import {createDuck} from "./graphql/mutations";
-import {Card, Col, Layout, Menu, Row} from 'antd';
+import {Button, Card, Col, Form, Input, Layout, Modal, Row, Upload} from 'antd';
 import './App.css'
 
-const {SubMenu} = Menu;
-const {Header, Content, Footer, Sider} = Layout;
+const {Content, Footer} = Layout;
+
+window.speechSynthesis.getVoices()
+
+const say = (text: string) => {
+    let speechSynthesisUtterance = new SpeechSynthesisUtterance(text)
+    speechSynthesisUtterance.lang = "en";
+    speechSynthesisUtterance.pitch = 0.7;
+    speechSynthesisUtterance.rate = 1.4;
+    const voices = window.speechSynthesis.getVoices();
+
+    speechSynthesisUtterance.voice = voices.length > 12 ? voices[12] : voices[0];
+    window.speechSynthesis.speak(speechSynthesisUtterance);
+}
 
 const App = () => {
     const [ducks, setDucks] = useState<any[]>([]);
@@ -15,6 +27,7 @@ const App = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [image, setImage] = useState<any>(null);
+    const [modalVisible, toggleModalVisible] = useState(false);
 
     const fetchDucks = async () => {
         const apiData = await API.graphql({query: listDucks});
@@ -35,6 +48,12 @@ const App = () => {
         fetchDucks();
     }, []);
 
+    const resetForm = () => {
+        setName('');
+        setImage(null);
+        setDescription('');
+    };
+
     const onSubmit = async (e: any) => {
         e.preventDefault();
         if (!name || !description || !image) return;
@@ -45,9 +64,20 @@ const App = () => {
 
         fetchDucks();
 
-        setName('');
-        setImage(null);
-        setDescription('');
+        resetForm();
+        toggleModalVisible(false);
+    }
+
+    const onDuckClick = (duck: any) => () => {
+        if (window.speechSynthesis.speaking) return;
+
+        say(duck.description);
+    };
+
+
+    const onCancel = () => {
+        toggleModalVisible(false);
+        resetForm();
     }
 
     return (
@@ -65,6 +95,13 @@ const App = () => {
 
                 <br/>
                 <br/>
+
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                    <Button onClick={() => toggleModalVisible(true)} size="large">
+                        Add your own duck!
+                    </Button>
+                </div>
+
                 <br/>
                 <br/>
 
@@ -79,25 +116,48 @@ const App = () => {
                                                 <img alt={duck.name} src={duck.image}/>
                                             </div>
                                         </div>
-                                    )}>
+                                    )} onClick={onDuckClick(duck)}>
                                         <Card.Meta title={duck.name} description={duck.description}/>
                                     </Card>
+                                    <br/>
                                 </Col>
                             ))}
                         </Row>
 
-                        <form action="" onSubmit={onSubmit}>
-                            <input type="text" value={name} onChange={e => setName(e.target.value)}
-                                   placeholder="Duck name"/>
-                            <textarea placeholder="Duck description"
-                                      onChange={e => setDescription(e.target.value)}>{description}</textarea>
-                            <input type="file" placeholder="Image" onChange={e => {
-                                // @ts-ignore
-                                setImage(e.target.files[0]);
-                            }}/>
 
-                            <button>Add your duck</button>
-                        </form>
+                        <Modal
+                            title="Quack quack"
+                            visible={modalVisible}
+                            onOk={onSubmit}
+                            onCancel={onCancel}
+                            okText="Add duck"
+                        >
+                            <Form layout="vertical">
+                                <Form.Item label="Name">
+                                    <Input type="text" value={name} onChange={e => setName(e.target.value)}/>
+                                </Form.Item>
+
+                                <Form.Item label="Quote">
+                                    <Input.TextArea value={description} onChange={e => setDescription(e.target.value)}/>
+                                </Form.Item>
+
+                                <Form.Item label="Image">
+                                    <Upload
+                                        showUploadList={false}
+                                        customRequest={() => {
+                                        }}
+                                        onChange={e => setImage(e.file.originFileObj)}
+                                    >
+                                        {image && <img src={URL.createObjectURL(image)} alt="avatar"
+                                                       className="duck-form-image"/>}
+
+                                        <Button type="primary" size="small">
+                                            {image ? 'Zmień' : 'Dodaj'} zdjęcie
+                                        </Button>
+                                    </Upload>
+                                </Form.Item>
+                            </Form>
+                        </Modal>
                     </Content>
                 </Layout>
             </Content>

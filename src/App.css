@@ -15,3 +15,11 @@
 .duck-image img {
     display: none;
 }
+
+.duck-form-image {
+    width: 30%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    cursor: pointer;
+}
